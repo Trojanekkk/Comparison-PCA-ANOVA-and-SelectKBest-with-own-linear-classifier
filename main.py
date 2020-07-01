@@ -2,7 +2,7 @@ import numpy as np
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import RepeatedStratifiedKFold
 from sklearn.decomposition import PCA
-from sklearn.feature_selection import SelectKBest, f_classif
+from sklearn.feature_selection import SelectKBest, f_classif, mutual_info_classif
 from scipy.stats import ttest_ind
 from linear_classifier import linear_classifier
 
@@ -21,10 +21,11 @@ def accuracy (y, y_pred):
     return points / len(y_pred)
 
 # Stworzenie słownika klas redukcji dla zadanej liczby wymiarów
-dimension = 2
+dimension = 3
 reducers = {
     "PCA" : PCA(n_components=dimension),
-    "ANOVA" : SelectKBest(score_func=f_classif, k=dimension)
+    "ANOVA" : SelectKBest(score_func=f_classif, k=dimension),
+    "SelectKBest" : SelectKBest(score_func=mutual_info_classif, k=dimension)
 }
 
 # Importowanie zbioru danych, wydzielenie etykiet i wzorców
@@ -45,9 +46,9 @@ rskf = RepeatedStratifiedKFold(n_splits=folds, n_repeats=repeats, random_state=1
 # Inicjalizowanie nowego obiektu
 lc = linear_classifier()
 
-scores = [[],[]]
+scores = np.zeros((len(reducers), folds * repeats))
 # Podział zbiorów wg stratyfikowanej k-foldowej walidacji z powtórzeniami
-for train_i, test_i in rskf.split(X, y):
+for fold_i, (train_i, test_i) in enumerate(rskf.split(X, y)):
     
     #Wybór naprzemiennie PCA i ANOVA do redukcji kolejnych foldów
     for reducer_i, reducer in enumerate(reducers):
@@ -66,7 +67,7 @@ for train_i, test_i in rskf.split(X, y):
 
         # Obliczenie jakości dla uzyskanej predykcji
         score = accuracy(y_test, y_pred)
-        scores[reducer_i].append(score)
+        scores[reducer_i][fold_i] = score
 
 # Wyznaczenie średniej i wariancji jakości dla metod redukcji
 for reducer_score_i, reducer_score in enumerate(scores):
