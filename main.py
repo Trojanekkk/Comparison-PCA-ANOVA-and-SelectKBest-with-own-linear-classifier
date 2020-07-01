@@ -1,10 +1,10 @@
 import numpy as np
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import RepeatedStratifiedKFold
-from linear_classifier import linear_classifier
 from sklearn.decomposition import PCA
-from sklearn.feature_selection import SelectKBest
-from sklearn.feature_selection import f_classif
+from sklearn.feature_selection import SelectKBest, f_classif
+from scipy.stats import ttest_ind
+from linear_classifier import linear_classifier
 
 # Jakość predykcji
 def accuracy (y, y_pred):
@@ -21,10 +21,10 @@ def accuracy (y, y_pred):
     return points / len(y_pred)
 
 # Stworzenie słownika klas redukcji dla zadanej liczby wymiarów
-dimension = 3
+dimension = 2
 reducers = {
-    "pca" : PCA(n_components=dimension),
-    "anova" : SelectKBest(score_func=f_classif, k=dimension)
+    "PCA" : PCA(n_components=dimension),
+    "ANOVA" : SelectKBest(score_func=f_classif, k=dimension)
 }
 
 # Importowanie zbioru danych, wydzielenie etykiet i wzorców
@@ -39,7 +39,7 @@ X = scaler.transform(X)
 
 # Stworzenie obiektu do obsługi foldów
 folds = 5
-repeats = 10
+repeats = 2
 rskf = RepeatedStratifiedKFold(n_splits=folds, n_repeats=repeats, random_state=1410)
 
 # Inicjalizowanie nowego obiektu
@@ -68,9 +68,11 @@ for train_i, test_i in rskf.split(X, y):
         score = accuracy(y_test, y_pred)
         scores[reducer_i].append(score)
 
-# Wyznaczenie średniej jakości dla metod redukcji
+# Wyznaczenie średniej i wariancji jakości dla metod redukcji
 for reducer_score_i, reducer_score in enumerate(scores):
-    mean_score = sum(scores[reducer_score_i]) / len(scores[reducer_score_i])
-    print(mean_score)
+    mean_score = np.round(sum(reducer_score) / len(reducer_score), 3)
+    std_score = np.round(np.std(reducer_score), 3)
+    print("średnia: {}, std: {} <- {}".format(mean_score, std_score, list(reducers.keys())[reducer_score_i]))
 
+# Testy parowe
 # Porównanie jakości dla PCA, ANOVA (testy parowe, testy globalne na 7 rangach)
