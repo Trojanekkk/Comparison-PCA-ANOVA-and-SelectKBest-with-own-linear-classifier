@@ -32,6 +32,7 @@ class linear_classifier:
                     tmp.append(element)
             self.centroids.append(np.mean(tmp, axis=0))
 
+        # Obliczenie punktu środkowego między centroidami oraz wektora normalnego
         self.centroid_center = np.mean((self.centroids), axis=0)
         self.centroid_vector = np.sum((np.divide((self.centroids[0]), -1), self.centroid_center), axis=0)
         
@@ -59,6 +60,7 @@ class linear_classifier:
         #         d.append(math.sqrt(sqr_d))
         #     y_pred.append(d.index(min(d)))
 
+        # Predykcja poprzez określenie położenia próbki względem hiperpłaszczyzny
         y_pred = []
         for i in range(len(X)):
             g = 0
