@@ -21,7 +21,7 @@ def accuracy (y, y_pred):
     return points / len(y_pred)
 
 # Stworzenie słownika klas redukcji dla zadanej liczby wymiarów
-dimension = 3
+dimension = 4
 reducers = {
     "PCA" : PCA(n_components=dimension),
     "ANOVA" : SelectKBest(score_func=f_classif, k=dimension),
