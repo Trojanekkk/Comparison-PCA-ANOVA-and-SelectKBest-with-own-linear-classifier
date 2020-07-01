@@ -69,6 +69,8 @@ for fold_i, (train_i, test_i) in enumerate(rskf.split(X, y)):
         score = accuracy(y_test, y_pred)
         scores[reducer_i][fold_i] = score
 
+np.save("results", scores)
+
 # Wyznaczenie średniej i wariancji jakości dla metod redukcji
 for reducer_score_i, reducer_score in enumerate(scores):
     mean_score = np.round(sum(reducer_score) / len(reducer_score), 3)
