@@ -1,7 +1,8 @@
 import numpy as np
 from sklearn.preprocessing import StandardScaler
-from sklearn.model_selection import KFold
+from sklearn.model_selection import RepeatedStratifiedKFold
 from linear_classifier import linear_classifier
+from sklearn.decomposition import PCA
 
 # Jakość predykcji
 def accuracy (y, y_pred):
@@ -28,13 +29,14 @@ scaler.fit(X)
 X = scaler.transform(X)
 
 # Stworzenie obiektu do obsługi foldów
-kf = KFold(n_splits=5, shuffle=True, random_state=1410)
+rskf = RepeatedStratifiedKFold(n_splits=5, n_repeats=10, random_state=1410)
 
 # Inicjalizowanie nowego obiektu
 lc = linear_classifier()
 
 scores = []
-for train_i, test_i in kf.split(X):
+# Podział zbiorów wg stratyfikowanej k-foldowej walidacji z powtórzeniami
+for train_i, test_i in rskf.split(X, y):
     X_train = X[train_i]
     y_train = y[train_i]
     X_test = X[test_i]
@@ -50,9 +52,10 @@ for train_i, test_i in kf.split(X):
     score = accuracy(y_test, y_pred)
     scores.append(score)
 
-print(sum(scores) / len(scores))
+# Wyznaczenie średniej jakości
+mean_score = sum(scores) / len(scores)
+print(mean_score)
 
 # Przeprowadzenie PCA, ANOVA
-# Walidacja krzyżowa
 # Obliczenie jakości
 # Porównanie jakości dla PCA, ANOVA (testy parowe, testy globalne na 7 rangach)

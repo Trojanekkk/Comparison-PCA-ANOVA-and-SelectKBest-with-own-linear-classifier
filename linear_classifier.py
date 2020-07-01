@@ -16,11 +16,11 @@ class linear_classifier:
         self.y = y
 
         # Ekstrakcja unikatowych klas
-        self.uniqueClasses = []
+        self.unique_classes = []
         for label in self.y:
-            if label not in self.uniqueClasses:
-                self.uniqueClasses.append(label)
-        if (len(self.uniqueClasses) != 2):
+            if label not in self.unique_classes:
+                self.unique_classes.append(label)
+        if (len(self.unique_classes) != 2):
             raise ValueError("Classifier is for datasets with 2-classes only")
 
         # center = []
@@ -38,7 +38,7 @@ class linear_classifier:
 
         # Obliczenie centroidów dla każdej z klas
         self.centroids = []
-        for cls in self.uniqueClasses:
+        for cls in self.unique_classes:
             tmp = []
             for index, element in enumerate(self.X):
                 if (self.y[index] == cls):
@@ -62,7 +62,7 @@ class linear_classifier:
         y_pred = []
         for i in range(len(X)):
             d = []
-            for cls_i, cls in enumerate(self.uniqueClasses):
+            for cls_i, cls in enumerate(self.unique_classes):
                 sqr_d = 0
                 for j in range(len(X[0])):
                     sqr_d += (X[i][j] - self.centroids[cls_i][j]) ** 2
