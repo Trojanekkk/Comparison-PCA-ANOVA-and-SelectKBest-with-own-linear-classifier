@@ -25,12 +25,13 @@ dimension = 3
 reducers = {
     "PCA" : PCA(n_components=dimension),
     "ANOVA" : SelectKBest(score_func=f_classif, k=dimension),
-    "SelectKBest" : SelectKBest(score_func=mutual_info_classif, k=dimension)
+    "SelectKBest" : SelectKBest(score_func=mutual_info_classif, k=dimension),
+    "None" : False
 }
 
 # Lista danych do importowania
-datasets = ['haberman']
-d = ['monk-2', 'caesarian', 'australian', 'ring', 'phoneme', 'heart', 'titanic', 'haberman']
+datasets = ['australian']
+# ['monk-2', 'caesarian', 'australian', 'ring', 'phoneme', 'heart', 'titanic', 'haberman']
 # Stworzenie obiektu do obsługi foldów
 folds = 5
 repeats = 2
@@ -63,11 +64,17 @@ for data_index, dataset in enumerate(datasets):
         #Wybór naprzemiennie PCA i ANOVA do redukcji kolejnych foldów
         for reducer_i, reducer in enumerate(reducers):
             reducer_obj = reducers[reducer]
-            X_tmp = reducer_obj.fit_transform(X, y)
-            X_train = X_tmp[train_i]
-            y_train = y[train_i]
-            X_test = X_tmp[test_i]
-            y_test = y[test_i]
+            if reducer == "None":
+                X_train = X[train_i]
+                y_train = y[train_i]
+                X_test = X[test_i]
+                y_test = y[test_i]
+            else:
+                X_tmp = reducer_obj.fit_transform(X, y)
+                X_train = X_tmp[train_i]
+                y_train = y[train_i]
+                X_test = X_tmp[test_i]
+                y_test = y[test_i]
 
             # Uczenie
             lc.fit(X_train, y_train)
